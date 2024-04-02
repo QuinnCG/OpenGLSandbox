@@ -9,6 +9,15 @@ namespace OpenGLSandbox;
 
 unsafe abstract class Application
 {
+	protected Vector2i Size
+	{
+		get
+		{
+			GLFW.GetWindowSize(_window, out int width, out int height);
+			return new(width, height);
+		}
+	}
+
 	private Window* _window;
 
 	protected static void Log(object message)
@@ -155,7 +164,10 @@ unsafe abstract class Application
 
 	private void InitializeOpenGL()
 	{
+		Log("Initializing");
+
 		GL.LoadBindings(new GLFWBindingsContext());
+		Log($"OpenGL version {GL.GetString(StringName.Version)}");
 
 		GL.Enable(EnableCap.DebugOutput);
 		GL.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
@@ -172,6 +184,8 @@ unsafe abstract class Application
 
 	private void MainLoop()
 	{
+		Log("Entering main loop");
+
 		while (!GLFW.WindowShouldClose(_window))
 		{
 			GL.ClearColor(Color4.Black);
