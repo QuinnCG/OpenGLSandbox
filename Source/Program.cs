@@ -6,7 +6,7 @@ static class Program
 {
 	private static void Main()
 	{
-		var app = new TriangleApp();
+		var app = new QuadApp();
 		app.Run();
 	}
 }

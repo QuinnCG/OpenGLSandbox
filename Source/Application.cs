@@ -9,16 +9,12 @@ namespace OpenGLSandbox;
 
 unsafe abstract class Application
 {
-	protected Vector2i Size
-	{
-		get
-		{
-			GLFW.GetWindowSize(_window, out int width, out int height);
-			return new(width, height);
-		}
-	}
+	protected Vector2 Size => _size;
+
+	private Vector2 _size;
 
 	private Window* _window;
+	private int _glErrorID = -1;
 
 	protected static void Log(object message)
 	{
@@ -158,8 +154,14 @@ unsafe abstract class Application
 		GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
 		GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 3);
 
-		_window = GLFW.CreateWindow(1200, 800, "OpenGL Sandbox", null, null);
+		const int Width = 1200;
+		const int Height = 800;
+		const string Title = "OpenGL Sandbox";
+
+		_window = GLFW.CreateWindow(Width, Height, Title, null, null);
 		GLFW.MakeContextCurrent(_window);
+
+		_size = new Vector2i(Width, Height);
 	}
 
 	private void InitializeOpenGL()
@@ -169,15 +171,20 @@ unsafe abstract class Application
 		GL.LoadBindings(new GLFWBindingsContext());
 		Log($"OpenGL version {GL.GetString(StringName.Version)}");
 
+#if DEBUG
 		GL.Enable(EnableCap.DebugOutput);
 		GL.DebugMessageCallback((source, type, id, severity, length, message, userParam) =>
 		{
+			if (id == _glErrorID) return;
+			_glErrorID = id;
+
 			if (severity is not (DebugSeverity.DontCare or DebugSeverity.DebugSeverityNotification or DebugSeverity.DebugSeverityLow))
 			{
 				string msg = Encoding.Default.GetString((byte*)message, length);
 				Error(msg, "OpenGL");
 			}
 		}, 0);
+#endif
 
 		OnInitialize();
 	}

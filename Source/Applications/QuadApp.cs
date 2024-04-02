@@ -3,7 +3,7 @@ using OpenTK.Mathematics;
 
 namespace OpenGLSandbox.Applications;
 
-class TriangleApp : Application
+class QuadApp : Application
 {
 	private int _vao, _vbo, _ibo;
 	private int _shader;
@@ -13,7 +13,7 @@ class TriangleApp : Application
 		_vao = GL.GenVertexArray();
 		GL.BindVertexArray(_vao);
 
-		var mesh = LoadMesh("Triangle.mesh");
+		var mesh = LoadMesh("Quad.mesh");
 		Assert(mesh.Vertices.Length > 0, "Mesh vertices are missing!");
 		Assert(mesh.Indices.Length > 0, "Mesh indices are missing!");
 
@@ -25,10 +25,15 @@ class TriangleApp : Application
 		GL.BindBuffer(BufferTarget.ElementArrayBuffer, _ibo);
 		GL.BufferData(BufferTarget.ElementArrayBuffer, sizeof(uint) * mesh.Indices.Length, mesh.Indices, BufferUsageHint.StaticDraw);
 
-		GL.EnableVertexAttribArray(0);
-		GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, sizeof(float) * 2, 0);
+		int stride = sizeof(float) * 4;
 
-		_shader = CreateShader("Triangle.shader");
+		GL.EnableVertexAttribArray(0);
+		GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, stride, 0);
+
+		GL.EnableVertexAttribArray(1);
+		GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride, sizeof(float) * 2);
+
+		_shader = CreateShader("Quad.shader");
 		GL.UseProgram(_shader);
 	}
 
@@ -40,7 +45,7 @@ class TriangleApp : Application
 		mvp *= Matrix4.CreateOrthographic(Size.X / Size.Y * orthoScale, orthoScale, 0.1f, 1f);
 		GL.UniformMatrix4(GL.GetUniformLocation(_shader, "u_mvp"), true, ref mvp);
 
-		GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
+		GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
 	}
 
 	protected override void OnCleanUp()
