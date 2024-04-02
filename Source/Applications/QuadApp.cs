@@ -3,6 +3,9 @@ using OpenTK.Mathematics;
 
 namespace OpenGLSandbox.Applications;
 
+// TODO: Add textures, then draw many quads as separate calls, benchmark. Later, make batch rendering app and benchmark.
+// TODO: Create a cube app that shows 3D.
+// TODO: Lightning app.
 class QuadApp : Application
 {
 	private int _vao, _vbo, _ibo;
@@ -33,19 +36,29 @@ class QuadApp : Application
 		GL.EnableVertexAttribArray(1);
 		GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, stride, sizeof(float) * 2);
 
-		_shader = CreateShader("Quad.shader");
+		_shader = CreateShader("Quad.glsl");
 		GL.UseProgram(_shader);
 	}
 
 	protected override void OnRender()
 	{
-		const float orthoScale = 2f;
+		var quads = new Vector2[]
+		{
+			new(-1f, 0f),
+			new(1f, 0f)
+		};
 
-		var mvp = Matrix4.Identity;
-		mvp *= Matrix4.CreateOrthographic(Size.X / Size.Y * orthoScale, orthoScale, 0.1f, 1f);
-		GL.UniformMatrix4(GL.GetUniformLocation(_shader, "u_mvp"), true, ref mvp);
+		foreach (var quad in quads)
+		{
+			const float orthoScale = 5f;
 
-		GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+			var mvp = Matrix4.Identity;
+			mvp *= Matrix4.CreateTranslation(quad.X, quad.Y, 0f);
+			mvp *= Matrix4.CreateOrthographic(Size.X / Size.Y * orthoScale, orthoScale, 0f, 1f);
+
+			GL.UniformMatrix4(GL.GetUniformLocation(_shader, "u_mvp"), true, ref mvp);
+			GL.DrawElements(PrimitiveType.Triangles, 6, DrawElementsType.UnsignedInt, 0);
+		}
 	}
 
 	protected override void OnCleanUp()

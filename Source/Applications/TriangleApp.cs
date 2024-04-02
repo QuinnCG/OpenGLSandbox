@@ -28,7 +28,7 @@ class TriangleApp : Application
 		GL.EnableVertexAttribArray(0);
 		GL.VertexAttribPointer(0, 2, VertexAttribPointerType.Float, false, sizeof(float) * 2, 0);
 
-		_shader = CreateShader("Triangle.shader");
+		_shader = CreateShader("Triangle.glsl");
 		GL.UseProgram(_shader);
 	}
 
@@ -38,8 +38,8 @@ class TriangleApp : Application
 
 		var mvp = Matrix4.Identity;
 		mvp *= Matrix4.CreateOrthographic(Size.X / Size.Y * orthoScale, orthoScale, 0.1f, 1f);
-		GL.UniformMatrix4(GL.GetUniformLocation(_shader, "u_mvp"), true, ref mvp);
 
+		GL.UniformMatrix4(GL.GetUniformLocation(_shader, "u_mvp"), true, ref mvp);
 		GL.DrawElements(PrimitiveType.Triangles, 3, DrawElementsType.UnsignedInt, 0);
 	}
 

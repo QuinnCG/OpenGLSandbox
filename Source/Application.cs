@@ -151,8 +151,8 @@ unsafe abstract class Application
 
 		GLFW.WindowHint(WindowHintBool.Resizable, false);
 		GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
+		GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 4);
 		GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
-		GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 3);
 
 		const int Width = 1200;
 		const int Height = 800;
@@ -170,6 +170,9 @@ unsafe abstract class Application
 
 		GL.LoadBindings(new GLFWBindingsContext());
 		Log($"OpenGL version {GL.GetString(StringName.Version)}");
+
+		GL.FrontFace(FrontFaceDirection.Cw);
+		GL.CullFace(CullFaceMode.Back);
 
 #if DEBUG
 		GL.Enable(EnableCap.DebugOutput);
