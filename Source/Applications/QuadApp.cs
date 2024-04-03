@@ -5,7 +5,7 @@ namespace OpenGLSandbox.Applications;
 
 // TODO: Add textures, then draw many quads as separate calls, benchmark. Later, make batch rendering app and benchmark.
 // TODO: Create a cube app that shows 3D.
-// TODO: Lightning app.
+// TODO: Lighting app.
 class QuadApp : Application
 {
 	private int _vao, _vbo, _ibo;
@@ -42,16 +42,36 @@ class QuadApp : Application
 
 	protected override void OnRender()
 	{
-		var quads = new Vector2[]
+		int count = 100;
+		int dim = (int)MathF.Round(MathF.Sqrt(count));
+
+		int width = dim;
+		int height = dim;
+
+		var quads = new Vector2[width * height];
+		float gap = 0.05f;
+
+		int halfWidth = width / 2;
+		int halfHeight = height / 2;
+
+		float size = 1f + gap;
+		float halfSize = size / 2f;
+
+		for (int i = 0; i < width; i++)
 		{
-			new(-1f, 0f),
-			new(1f, 0f)
-		};
+			for (int j = 0; j < height; j++)
+			{
+				float x = ((float)i - halfWidth + halfSize);
+				float y = ((float)j - halfHeight + halfSize);
+
+				quads[(j * width) + i] = new Vector2(x, y) * size;
+			}
+		}
+
+		float orthoScale = height + (height * 0.2f);
 
 		foreach (var quad in quads)
 		{
-			const float orthoScale = 5f;
-
 			var mvp = Matrix4.Identity;
 			mvp *= Matrix4.CreateTranslation(quad.X, quad.Y, 0f);
 			mvp *= Matrix4.CreateOrthographic(Size.X / Size.Y * orthoScale, orthoScale, 0f, 1f);
