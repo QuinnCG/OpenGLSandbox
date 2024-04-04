@@ -182,7 +182,7 @@ unsafe abstract class Application
 
 		const int Width = 1200;
 		const int Height = 800;
-		const string Title = "OpenGL Sandbox";
+		string Title = GetType().Name;
 
 		_window = GLFW.CreateWindow(Width, Height, Title, null, null);
 		GLFW.MakeContextCurrent(_window);
@@ -229,13 +229,6 @@ unsafe abstract class Application
 		OnInitialize();
 	}
 
-	/*
-	 * #####################
-	 * # RENDER BENCHAMRKS #
-	 * #####################
-	 * One-At-a-Time-Rendering:
-	 *		Best: 233 MS, avg: 258 MS, worst: 544 MS
-	*/
 	private void MainLoop()
 	{
 		Log("Entering main loop");

@@ -1,5 +1,5 @@
 ﻿using OpenGLSandbox.Applications;
-using System.Text;
+using OpenGLSandbox.Applications.BatchApp;
 
 namespace OpenGLSandbox;
 
@@ -14,7 +14,8 @@ static class Program
 		var appTypes = new Type[]
 		{
 			typeof(TriangleApp),
-			typeof(QuadApp)
+			typeof(QuadApp),
+			typeof(BatchApp)
 		};
 
 		for (int i = 0; i < appTypes.Length; i++)
@@ -41,7 +42,7 @@ static class Program
 			}
 		}
 #else
-		var app = new QuadApp();
+		var app = new BatchApp();
 		app.Run();
 #endif
 	}
