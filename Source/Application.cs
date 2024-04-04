@@ -229,12 +229,27 @@ unsafe abstract class Application
 		OnInitialize();
 	}
 
+	/*
+	 * #####################
+	 * # RENDER BENCHAMRKS #
+	 * #####################
+	 * One-At-a-Time-Rendering:
+	 *		Best: 233 MS, avg: 258 MS, worst: 544 MS
+	*/
 	private void MainLoop()
 	{
 		Log("Entering main loop");
 
+		//int frameCount = 0;
+		//float msSum = 0f;
+		//float lowMS = float.PositiveInfinity, highMS = 0f;
+
 		while (!GLFW.WindowShouldClose(_window))
 		{
+			if (GLFW.GetTime() >= 10f) break;
+
+			//var sw = Stopwatch.StartNew();
+
 			GL.ClearColor(Color4.Black);
 			GL.Clear(ClearBufferMask.ColorBufferBit);
 
@@ -247,7 +262,20 @@ unsafe abstract class Application
 			{
 				GLFW.SetWindowShouldClose(_window, true);
 			}
+
+			//sw.Stop();
+			//float ms = sw.ElapsedMilliseconds;
+
+			//if (ms < lowMS) lowMS = ms;
+			//if (ms > highMS) highMS = ms;
+
+			//msSum += ms;
+			//frameCount++;
 		}
+
+		//Log($"Best: {lowMS}, avg: {msSum / frameCount}, worst: {highMS}");
+
+		//Console.ReadKey(true);
 	}
 
 	private void CleanUp()

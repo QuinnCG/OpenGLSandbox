@@ -43,7 +43,7 @@ class QuadApp : Application
 
 	protected override void OnRender()
 	{
-		int count = 100;
+		int count = 100000;
 		int dim = (int)MathF.Round(MathF.Sqrt(count));
 
 		int width = dim;
