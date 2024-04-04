@@ -1,6 +1,7 @@
 ﻿using OpenTK.Graphics.OpenGL4;
 using OpenTK.Mathematics;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using StbiSharp;
 using System.Diagnostics;
 using System.Diagnostics.CodeAnalysis;
 using System.Text;
@@ -9,9 +10,7 @@ namespace OpenGLSandbox;
 
 unsafe abstract class Application
 {
-	protected Vector2 Size => _size;
-
-	private Vector2 _size;
+	protected Vector2 Size { get; private set; }
 
 	private Window* _window;
 	private int _glErrorID = -1;
@@ -57,6 +56,11 @@ unsafe abstract class Application
 	protected static string GetResouceText(string path)
 	{
 		return File.ReadAllText($"Resources/{path}");
+	}
+
+	protected static byte[] GetResouceBinary(string path)
+	{
+		return File.ReadAllBytes($"Resources/{path}");
 	}
 
 	protected static int CreateShader(string path)
@@ -123,6 +127,27 @@ unsafe abstract class Application
 		return new Mesh(vertices, indices);
 	}
 
+	protected static int LoadTexture(string path)
+	{
+		var data = GetResouceBinary(path);
+
+		Stbi.SetFlipVerticallyOnLoad(true);
+		StbiImage image = Stbi.LoadFromMemory(new ReadOnlySpan<byte>(data), 4);
+
+		int handle = GL.GenTexture();
+		GL.BindTexture(TextureTarget.Texture2D, handle);
+
+		GL.TextureParameter(handle, TextureParameterName.TextureMinFilter, (float)TextureMinFilter.Linear);
+		GL.TextureParameter(handle, TextureParameterName.TextureMagFilter, (float)TextureMagFilter.Linear);
+		GL.TextureParameter(handle, TextureParameterName.TextureWrapS, (float)TextureWrapMode.ClampToEdge);
+		GL.TextureParameter(handle, TextureParameterName.TextureWrapT, (float)TextureWrapMode.ClampToEdge);
+
+		GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba8, image.Width, image.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, image.Data.ToArray());
+		GL.GenerateMipmap(GenerateMipmapTarget.Texture2D);
+
+		return handle;
+	}
+
 	public void Run()
 	{
 		try
@@ -149,7 +174,8 @@ unsafe abstract class Application
 	{
 		GLFW.Init();
 
-		GLFW.WindowHint(WindowHintBool.Resizable, false);
+		GLFW.WindowHint(WindowHintInt.Samples, 4);
+		GLFW.WindowHint(WindowHintBool.Resizable, true);
 		GLFW.WindowHint(WindowHintOpenGlProfile.OpenGlProfile, OpenGlProfile.Core);
 		GLFW.WindowHint(WindowHintInt.ContextVersionMinor, 4);
 		GLFW.WindowHint(WindowHintInt.ContextVersionMajor, 4);
@@ -161,7 +187,7 @@ unsafe abstract class Application
 		_window = GLFW.CreateWindow(Width, Height, Title, null, null);
 		GLFW.MakeContextCurrent(_window);
 
-		_size = new Vector2i(Width, Height);
+		Size = new Vector2i(Width, Height);
 	}
 
 	private void InitializeOpenGL()
@@ -173,6 +199,17 @@ unsafe abstract class Application
 
 		GL.FrontFace(FrontFaceDirection.Cw);
 		GL.CullFace(CullFaceMode.Back);
+
+		GL.Enable(EnableCap.Blend);
+		GL.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+
+		GL.Enable(EnableCap.Multisample);
+
+		GLFW.SetFramebufferSizeCallback(_window, (window, width, height) =>
+		{
+			GL.Viewport(0, 0, width, height);
+			Size = new Vector2i(width, height);
+		});
 
 #if DEBUG
 		GL.Enable(EnableCap.DebugOutput);

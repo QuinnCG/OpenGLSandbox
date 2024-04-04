@@ -3,13 +3,10 @@ using OpenTK.Mathematics;
 
 namespace OpenGLSandbox.Applications;
 
-// TODO: Add textures, then draw many quads as separate calls, benchmark. Later, make batch rendering app and benchmark.
-// TODO: Create a cube app that shows 3D.
-// TODO: Lighting app.
 class QuadApp : Application
 {
 	private int _vao, _vbo, _ibo;
-	private int _shader;
+	private int _shader, _texture;
 
 	protected override void OnInitialize()
 	{
@@ -38,6 +35,10 @@ class QuadApp : Application
 
 		_shader = CreateShader("Quad.glsl");
 		GL.UseProgram(_shader);
+
+		_texture = LoadTexture("Logo.png");
+		GL.ActiveTexture(TextureUnit.Texture0);
+		GL.BindTexture(TextureTarget.Texture2D, _texture);
 	}
 
 	protected override void OnRender()
@@ -88,5 +89,6 @@ class QuadApp : Application
 		GL.DeleteVertexArray(_vao);
 
 		GL.DeleteProgram(_shader);
+		GL.DeleteTexture(_texture);
 	}
 }
