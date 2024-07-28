@@ -3,14 +3,7 @@ using OpenTK.Mathematics;
 
 namespace OpenGLSandbox.Applications;
 
-/*
- * #####################
- * # RENDER BENCHAMRKS #
- * #####################
- * One-At-a-Time-Rendering (100,000 quads):
- *		Best: 233 MS, avg: 258 MS, worst: 544 MS
-*/
-class QuadApp : Application
+class SimpleBatchApp : Application
 {
 	private int _vao, _vbo, _ibo;
 	private int _shader, _texture;
@@ -75,6 +68,8 @@ class QuadApp : Application
 				quads[(j * width) + i] = new Vector2(x, y) * size;
 			}
 		}
+
+		// TODO: Construct one large mesh than render that.
 
 		float orthoScale = height + (height * 0.2f);
 
